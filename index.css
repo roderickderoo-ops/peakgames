@@ -3,18 +3,11 @@
     text-align: center;
     font-size: 3em;
 }
-.header{
-    display: flex;
-    padding: 20px;
-    justify-content: space-between;
-    align-items: center;
-}
+
 .header h1{
     text-align: center;
 }
-.titleImg{
-    border-radius: 20px;
-}
+
 .gameTitle{
     font-size: 1.5em;
     font-family: fantasy;
