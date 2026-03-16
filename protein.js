@@ -43,5 +43,39 @@ setInterval(function() {
     if(botProduction >= 1){
         protein++;
         botProduction--;
+        proteinLabel.textContent = Math.floot(protein);
     }
 }, 200);
+function saveGame(){
+    let saveData = {
+        protein: protein,
+        riceBots: riceBots,
+        ricebotCost: ricebotCost
+    };
+    localStorage.setItem("proteinClickerSave", JSON.stringify(saveData));
+    lastPlayed: Date.now()
+}
+setInterval(saveGame, 5000);
+
+function loadGame(){
+    let savedGame = localStorage.getItem("proteinClickerSave");
+
+    if(savedGame){
+        let saveData = JSON.parse(savedGame);
+
+        protein = saveData.protein || 0;
+        riceBots = saveData.riceBots || 0;
+        ricebotCost = saveData.ricebotCost || 15;
+
+        proteinLabel.textContent = Math.floor(protein);
+        riceCostLabel.textContent = "🍗" + ricebotCost;
+    }
+}
+loadGame();
+
+let now = Date.now();
+let timePassed = (now - saveDate.lastPlayed) / 1000;
+
+let offlineProduction = riceBots + ricebotMult * timePassed;
+
+protein += offlineProduction;
