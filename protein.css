@@ -1,0 +1,67 @@
+.header{
+    text-align: left;
+    padding: 30px;
+}
+.proteinPerSecond{
+    font-size: 1.5em;
+}
+.header h1{
+    font-size:48px;
+    margin-bottom:10px;
+}
+.chicken{
+    width:300px;
+  cursor:pointer;
+  border-radius:15px;
+  box-shadow:0 6px 12px rgba(0,0,0,0.15);
+  border: none;
+  margin-left: 0;
+}
+.botBtns{
+  width:100%;
+    padding:15px;
+    margin-bottom:12px;
+    border:none;
+    border-radius:10px;
+    background:#f5f5f5;
+    cursor:pointer;
+    text-align:left;
+    transition:0.15s;
+}
+.shop{
+    width:260px;
+    background:white;
+    border-radius:12px;
+    padding:20px;
+    box-shadow:0 6px 15px rgba(0,0,0,0.15);
+}
+
+.shop h2{
+    text-align:center;
+    margin-bottom:20px;
+}
+.botBtns:hover{
+    transform:scale(1.05);
+  background:#f0f0f0;
+}
+body{
+  font-family: Arial, sans-serif;
+  background:#f4f4f4;
+}
+.game{
+  display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:120px;
+    margin-top:40px;
+}
+.main{
+  margin-top:40px;
+  display:flex;
+  justify-content:flex-start;
+  align-items:center;
+  gap:30px;
+}
+.foodBtns:active{
+    transform: scale(0.97);
+}
