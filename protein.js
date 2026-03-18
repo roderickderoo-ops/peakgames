@@ -2,10 +2,8 @@ let protein = 0;
 let ricebotCost = 15;
 let amountPerClick = 1;
 let riceBots = 0;
-let botProduction = 0;
 let ricebotMult = 0.1;
 let ricebotCostMult = 1.01;
-let perSecond = botProduction;
 
 let friedChickenBtn = document.getElementById("friedChickenBtn");
 let proteinLabel = document.getElementById("proteinLabel");
@@ -13,9 +11,78 @@ let extraRiceBtn = document.getElementById("extraRiceBtn");
 let riceCostLabel = document.getElementById("ricebotCost");
 let perSecondLabel = document.getElementById("perSecondLabel");
 
+let upgradesContainer = document.getElementById("upgradesContainer");
+
+function renderUpgrades(){
+    upgradesContainer.innerHTML = "<h2>Upgrades</h2>";
+
+    upgrades.forEach(upgrade => {
+          if(!upgrade.bought){
+            
+            let btn = document.createElement("button")
+            btn.className = "upgradeBtn";
+
+            btn.innerHTML = `
+    <div class="upgradeTitle">${upgrade.name}</div>
+    <div class="upgradeCost">🍗${upgrade.cost}</div>
+`;
+
+            btn.onclick = function(){
+                if(protein >= upgrade.cost){
+                    protein -= upgrade.cost;
+                    upgrade.bought = true;
+                    upgrade.effect();
+                    renderUpgrades();
+                }
+            }
+            if(protein < upgrade.cost){btn.style.opacity = "0.5"}
+            upgradesContainer.appendChild(btn);
+        }
+    });
+}
+
+let upgrades = [
+    {
+        id: "doubleClick",
+        name: "doubleClick",
+        cost: 100,
+        bought: false,
+        effect: function(){
+            amountPerClick *= 2;
+        }
+    },
+    {
+        id: "AA battery",
+        name: "AA battery",
+        cost: 100,
+        bought: false,
+        effect: function(){
+            ricebotMult *= 2
+        }
+    },
+    {
+        id: "quadrupleClick",
+        name: "quadrupleClick",
+        cost: 500,
+        bought: false,
+        effect: function(){
+            amountPerClick *= 2
+        }
+    },
+    {
+    id: "AAAA battery",
+        name: "AAAA battery",
+        cost: 500,
+        bought: false,
+        effect: function(){
+            ricebotMult *= 2
+        }
+    }
+]
+
 friedChickenBtn.onclick = function(){
     protein += amountPerClick;
-    proteinLabel.textContent = protein;
+    proteinLabel.textContent = Math.floor(protein);
 }
 extraRiceBtn.onclick = function(){
     if(protein >= ricebotCost){
@@ -24,36 +91,35 @@ extraRiceBtn.onclick = function(){
         proteinLabel.textContent = protein;
 
         ricebotCost =1 + Math.floor(ricebotCost * 1.1 * ricebotCostMult);
+        ricebotCostMult *= 1.01;
     }
-     proteinLabel.textContent = protein;
+     proteinLabel.textContent = Math.floor(protein);
      riceCostLabel.textContent ="🍗" + ricebotCost;
 }
+setInterval(function(){
 
-setInterval(function() {
-    botProduction += riceBots * ricebotMult;
+    let production = riceBots * ricebotMult;
 
-     proteinLabel.textContent = protein;
-     perSecond = riceBots * ricebotMult;
-     perSecond = Math.round(perSecond * 10)/10;
-     perSecondLabel.textContent = perSecond;
+    protein += production;
+
+    proteinLabel.textContent = Math.floor(protein);
+
+    perSecondLabel.textContent = Math.round(production * 10) / 10;
+
+    renderUpgrades();
 },1000);
-
-
-setInterval(function() {
-    if(botProduction >= 1){
-        protein++;
-        botProduction--;
-        proteinLabel.textContent = Math.floot(protein);
-    }
-}, 200);
 function saveGame(){
     let saveData = {
         protein: protein,
         riceBots: riceBots,
-        ricebotCost: ricebotCost
+        ricebotCost: ricebotCost,
+        lastPlayed: Date.now(),
+        amountPerClick: amountPerClick,
+        ricebotMult: ricebotMult,
+        upgrades: upgrades
     };
     localStorage.setItem("proteinClickerSave", JSON.stringify(saveData));
-    lastPlayed: Date.now()
+    
 }
 setInterval(saveGame, 5000);
 
@@ -66,16 +132,40 @@ function loadGame(){
         protein = saveData.protein || 0;
         riceBots = saveData.riceBots || 0;
         ricebotCost = saveData.ricebotCost || 15;
+        amountPerClick = saveData.amountPerClick || 1;
+        ricebotMult = saveData.ricebotMult || 0.1;
+        upgrades = saveData.upgrades;
+        upgrades.forEach(upgrade => {
+        if(upgrade.id === "doubleClick"){
+            upgrade.effect = function(){
+                amountPerClick *= 2;
+            }
+        }
+        if(upgrade.id === "AA battery"){
+            upgrade.effect = function(){
+                ricebotMult *= 2;
+            }
+        }
+        if(upgrade.id === "quadrupleClick"){
+            upgrade.effect = function(){
+                amountPerClick *= 2;
+            }
+        }
+        if(upgrade.id === "AAAA battery"){
+            upgrade.effect = function(){
+                ricebotMult *= 2;
+            }
+        }
+    });
+        let now = Date.now();
+let timePassed = (now - saveData.lastPlayed) / 1000;
+
+let offlineProduction = riceBots * ricebotMult * timePassed;
+
+protein += offlineProduction;
 
         proteinLabel.textContent = Math.floor(protein);
         riceCostLabel.textContent = "🍗" + ricebotCost;
     }
 }
 loadGame();
-
-let now = Date.now();
-let timePassed = (now - saveDate.lastPlayed) / 1000;
-
-let offlineProduction = riceBots + ricebotMult * timePassed;
-
-protein += offlineProduction;
