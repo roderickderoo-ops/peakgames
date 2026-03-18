@@ -2,6 +2,11 @@
     text-align: left;
     padding: 30px;
 }
+#shopContainer{
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
 .proteinPerSecond{
     font-size: 1.5em;
 }
@@ -64,7 +69,15 @@
 }
 body{
   font-family: Arial, sans-serif;
-  background:#f4f4f4;
+   background-color: rgb(37, 86, 199);
+}
+.buildingBtn {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    text-align: left;
+    border-radius: 10px;
+    cursor: pointer;
 }
 .game{
   display:flex;
