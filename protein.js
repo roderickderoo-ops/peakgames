@@ -10,36 +10,7 @@ let proteinLabel = document.getElementById("proteinLabel");
 let extraRiceBtn = document.getElementById("extraRiceBtn");
 let riceCostLabel = document.getElementById("ricebotCost");
 let perSecondLabel = document.getElementById("perSecondLabel");
-
 let upgradesContainer = document.getElementById("upgradesContainer");
-
-function renderUpgrades(){
-    upgradesContainer.innerHTML = "<h2>Upgrades</h2>";
-
-    upgrades.forEach(upgrade => {
-          if(!upgrade.bought){
-            
-            let btn = document.createElement("button")
-            btn.className = "upgradeBtn";
-
-            btn.innerHTML = `
-    <div class="upgradeTitle">${upgrade.name}</div>
-    <div class="upgradeCost">🍗${upgrade.cost}</div>
-`;
-
-            btn.onclick = function(){
-                if(protein >= upgrade.cost){
-                    protein -= upgrade.cost;
-                    upgrade.bought = true;
-                    upgrade.effect();
-                    renderUpgrades();
-                }
-            }
-            if(protein < upgrade.cost){btn.style.opacity = "0.5"}
-            upgradesContainer.appendChild(btn);
-        }
-    });
-}
 
 let upgrades = [
     {
@@ -79,6 +50,34 @@ let upgrades = [
         }
     }
 ]
+function renderUpgrades(){
+    if(!upgrades) return;
+    upgradesContainer.innerHTML = "<h2>Upgrades</h2>";
+
+    upgrades.forEach(upgrade => {
+          if(!upgrade.bought){
+            
+            let btn = document.createElement("button")
+            btn.className = "upgradeBtn";
+
+            btn.innerHTML = `
+    <div class="upgradeTitle">${upgrade.name}</div>
+    <div class="upgradeCost">🍗${upgrade.cost}</div>
+`;
+
+            btn.onclick = function(){
+                if(protein >= upgrade.cost){
+                    protein -= upgrade.cost;
+                    upgrade.bought = true;
+                    upgrade.effect();
+                    renderUpgrades();
+                }
+            }
+            if(protein < upgrade.cost){btn.style.opacity = "0.5"}
+            upgradesContainer.appendChild(btn);
+        }
+    });
+}
 
 friedChickenBtn.onclick = function(){
     protein += amountPerClick;
@@ -134,7 +133,9 @@ function loadGame(){
         ricebotCost = saveData.ricebotCost || 15;
         amountPerClick = saveData.amountPerClick || 1;
         ricebotMult = saveData.ricebotMult || 0.1;
-        upgrades = saveData.upgrades;
+        if(saveData.upgrades){
+    upgrades = saveData.upgrades;
+}
         upgrades.forEach(upgrade => {
         if(upgrade.id === "doubleClick"){
             upgrade.effect = function(){
@@ -169,3 +170,4 @@ protein += offlineProduction;
     }
 }
 loadGame();
+renderUpgrades();
