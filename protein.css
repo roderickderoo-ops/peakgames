@@ -2,6 +2,21 @@
     text-align: left;
     padding: 30px;
 }
+.upgradeTitle{
+  position: relative;
+}
+.upgradeTitle:hover::after{
+  content: attr(title);
+  position: absolute;
+  bottom: 120%;
+    left: 0;
+    background: black;
+    color: white;
+    padding: 5px 8px;
+    border-radius: 6px;
+    font-size: 12px;
+    white-space: nowrap;
+}
 #shopContainer{
   display: flex;
   flex-direction: column;
