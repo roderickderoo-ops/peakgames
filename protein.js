@@ -191,7 +191,7 @@ function renderBuildings(){
 
         btn.innerHTML = `
         <div class="buildingTitle">${building.name} (${count})</div>
-        <div class="buildingCost">🍗${cost}</div>
+        <div class="buildingCost">🍗${formatNumber(cost)}</div>
         `;
 
         btn.onclick = function(){
@@ -240,7 +240,7 @@ function renderUpgrades(){
 
 friedChickenBtn.onclick = function(){
     protein += amountPerClick;
-    proteinLabel.textContent = Math.floor(protein);
+    proteinLabel.textContent = formatNumber(protein);
 }
 setInterval(function(){
 
@@ -248,9 +248,9 @@ setInterval(function(){
 
     protein += production;
 
-    proteinLabel.textContent = Math.floor(protein);
+    proteinLabel.textContent = formatNumber(protein);
 
-    perSecondLabel.textContent = Math.round(production * 10) / 10;
+    perSecondLabel.textContent = formatNumber(production);
 
     renderUpgrades();
     renderBuildings();
@@ -260,78 +260,110 @@ function saveGame(){
         protein: protein,
         riceBots: riceBots,
         ricebotCost: ricebotCost,
-        lastPlayed: Date.now(),
-        amountPerClick: amountPerClick,
         ricebotMult: ricebotMult,
-        upgrades: upgrades,
+
         proteinShakers: proteinShakers,
-        proteinShakerMult: proteinShakerMult
+        proteinShakerCost: proteinShakerCost,
+        proteinShakerMult: proteinShakerMult,
+
+        factories: factories,
+        factorieCost: factorieCost,
+
+        amountPerClick: amountPerClick,
+
+        upgrades: upgrades,
+
+        lastPlayed: Date.now()
     };
+
     localStorage.setItem("proteinClickerSave", JSON.stringify(saveData));
-    
 }
 setInterval(saveGame, 5000);
 
 function loadGame(){
     let savedGame = localStorage.getItem("proteinClickerSave");
 
-    if(savedGame){
-        let saveData = JSON.parse(savedGame);
-        protein = saveData.protein || 0;
-        riceBots = saveData.riceBots || 0;
-        ricebotCost = saveData.ricebotCost || 15;
-        amountPerClick = saveData.amountPerClick || 1;
-        ricebotMult = saveData.ricebotMult || 0.1;
-    }
-        if(saveData.upgrades){
-    upgrades = saveData.upgrades;
+    if(!savedGame) return;
+
+    let saveData = JSON.parse(savedGame);
+
+    // 💾 LOAD BASIC STATS
+    protein = saveData.protein || 0;
+
+    riceBots = saveData.riceBots || 0;
+    ricebotCost = saveData.ricebotCost || 15;
+    ricebotMult = saveData.ricebotMult || 0.1;
+
     proteinShakers = saveData.proteinShakers || 0;
+    proteinShakerCost = saveData.proteinShakerCost || 100;
     proteinShakerMult = saveData.proteinShakerMult || 1;
-        upgrades.forEach(upgrade => {
-      upgrades.forEach(upgrade => {
 
-    if(upgrade.id === "clickTier1"){
-        upgrade.effect = () => amountPerClick *= 2;
-    }
-    if(upgrade.id === "clickTier2"){
-        upgrade.effect = () => amountPerClick *= 2;
-    }
-    if(upgrade.id === "clickTier3"){
-        upgrade.effect = () => amountPerClick *= 2;
+    factories = saveData.factories || 0;
+    factorieCost = saveData.factorieCost || 1500;
+
+    amountPerClick = saveData.amountPerClick || 1;
+
+    // 💾 LOAD UPGRADES
+    if(saveData.upgrades){
+        upgrades = saveData.upgrades;
     }
 
-    if(upgrade.id === "riceTier1"){
-        upgrade.effect = () => ricebotMult *= 2;
-    }
-    if(upgrade.id === "riceTier2"){
-        upgrade.effect = () => ricebotMult *= 2;
-    }
-    if(upgrade.id === "riceTier3"){
-        upgrade.effect = () => ricebotMult *= 3;
-    }
+    // 🔧 RESTORE UPGRADE EFFECT FUNCTIONS
+    upgrades.forEach(upgrade => {
 
-    if(upgrade.id === "shakerTier1"){
-        upgrade.effect = () => proteinShakerMult *= 2;
-    }
-    if(upgrade.id === "shakerTier2"){
-        upgrade.effect = () => proteinShakerMult *= 2;
-    }
-    if(upgrade.id === "shakerTier3"){
-        upgrade.effect = () => proteinShakerMult *= 3;
-    }
+        if(upgrade.id === "clickTier1"){
+            upgrade.effect = () => amountPerClick *= 2;
+        }
+        if(upgrade.id === "clickTier2"){
+            upgrade.effect = () => amountPerClick *= 2;
+        }
+        if(upgrade.id === "clickTier3"){
+            upgrade.effect = () => amountPerClick *= 2;
+        }
 
-});
+        if(upgrade.id === "riceTier1"){
+            upgrade.effect = () => ricebotMult *= 2;
+        }
+        if(upgrade.id === "riceTier2"){
+            upgrade.effect = () => ricebotMult *= 2;
+        }
+        if(upgrade.id === "riceTier3"){
+            upgrade.effect = () => ricebotMult *= 3;
+        }
+
+        if(upgrade.id === "shakerTier1"){
+            upgrade.effect = () => proteinShakerMult *= 2;
+        }
+        if(upgrade.id === "shakerTier2"){
+            upgrade.effect = () => proteinShakerMult *= 2;
+        }
+        if(upgrade.id === "shakerTier3"){
+            upgrade.effect = () => proteinShakerMult *= 3;
+        }
     });
+
+    // ⏱️ OFFLINE PROGRESS
+    if(saveData.lastPlayed){
         let now = Date.now();
-let timePassed = (now - saveData.lastPlayed) / 1000;
+        let timePassed = (now - saveData.lastPlayed) / 1000;
 
-let offlineProduction = ((riceBots * ricebotMult) + (proteinShakers * proteinShakerMult)) * timePassed;
+        let production =
+            (riceBots * ricebotMult) +
+            (proteinShakers * proteinShakerMult) +
+            (factories * factorieMult);
 
-protein += offlineProduction;
-
-        proteinLabel.textContent = Math.floor(protein);
-        riceCostLabel.textContent = "🍗" + ricebotCost;
+        protein += production * timePassed;
     }
+
+    // 🖥️ UPDATE UI
+    proteinLabel.textContent = formatNumber(protein);
+    riceCostLabel.textContent = "🍗" + formatNumber(ricebotCost);
+}
+function formatNumber(num){
+    if(num >= 1e9){return(num/ 1e9).toFixed(1)} + "B"
+    if(num >= 1e6){return(num/ 1e6).toFixed(1)} + "M"
+    if(num >= 1e3){return(num/ 1e3).toFixed(1)} + "K"
+    return Math.floor(num);
 }
 loadGame();
 renderUpgrades();
